@@ -14,7 +14,7 @@ const config={
 connectionLimit:4,
   host: "localhost",
   user: "root",
-  password: "1234",
+  password: "pass_root@123",
   database:"dfoodie"
 }
 

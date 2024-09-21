@@ -32,11 +32,13 @@ app.use(express.static(path.join(__dirname, "public"))); //To serve static files
 //local:
 // app.use(express.static(path.join(__dirname, "dist")));
 //remote:
-app.use(express.static(path.join(__dirname, '../assignment2-1-208590174_207277997-main/dist')));
+// app.use(express.static(path.join(__dirname, '../assignment2-1-208590174_207277997-main/dist')));
+app.use(express.static(path.join(__dirname, '../assignment2-1-208590174_207277997/dist')));
 app.get("/",function(req,res)
 { 
   //remote: 
-  res.sendFile(path.join(__dirname, '../assignment2-1-208590174_207277997-maindist/index.html'));
+  res.sendFile(path.join(__dirname, '../assignment2-1-208590174_207277997/dist/index.html'));
+  // res.sendFile(path.join(__dirname, '../assignment2-1-208590174_207277997-maindist/index.html'));
   //local:
   // res.sendFile(__dirname+"/index.html");
 
@@ -55,7 +57,7 @@ app.options("*", cors(corsConfig));
 // var port = process.env.PORT; //local=3000 remote=80
 // var port = process.env.PORT || "80"; //local=3000 remote=80
 // var port = "3000"; //local=3000 remote=80
-var port = "3000";
+var port = "443";
 //#endregion
 const user = require("./routes/user");
 const recipes = require("./routes/recipes");
