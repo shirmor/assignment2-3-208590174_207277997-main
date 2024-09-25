@@ -1,6 +1,8 @@
 var express = require("express");
 var router = express.Router();
 const recipes_utils = require("./utils/recipes_utils");
+const user_utils = require("./utils/user_utils");
+
 
 router.get("/", (req, res) => res.send("im here"));
 
@@ -16,20 +18,15 @@ router.get("/search", async (req, res, next) => {
     const number = req.query.number || 5;
     const results = await recipes_utils.searchRecipe(recipeName, cuisine, diet, intolerance, number);
     res.send(results);
-    console.log(recipeName)
-    console.log(cuisine)
-    console.log(diet)
-    console.log(intolerance)
-    console.log(number)    
   } catch (error) {
     next(error);
   }
 });
 
 /**
- * This path returns a full details of a recipe by its id
+ * This path returns preview details of a recipe by its id
  */
-router.get("/:recipeId", async (req, res, next) => {
+router.get("preview/:recipeId", async (req, res, next) => {
   try {
     const recipe = await recipes_utils.getRecipeDetails(req.params.recipeId);
     res.send(recipe);
@@ -37,5 +34,57 @@ router.get("/:recipeId", async (req, res, next) => {
     next(error);
   }
 });
+
+
+/**
+ * This path returns a full view of a recipe by its id
+ */
+router.get("/fullview/:recipeId", async (req, res, next) => {
+  try {
+    const recipeId = req.params.recipeId.trim();
+    if (recipeId.startsWith("RU")) {
+      const recipe = await user_utils.getUserRecipeInformation(req.session.username, recipeId);
+      if (!recipe || recipe.error) {
+        throw { status: 404, message: "No results were found" };
+      }
+      res.status(200).send(recipe);
+    } else {
+      const recipe = await recipes_utils.getRecipeInformation(recipeId);
+      res.status(200).send(recipe);
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+
+
+/**
+ * This path returns 3 random recipes
+ */
+router.get("/random", async (req, res, next) => {
+  try {
+    var recipeDetails;
+    const recipes = await recipes_utils.getRandomRecipes(3);
+    const recipeIds = recipes.map(recipe => (String(recipe.id)));
+    var recipesDetailsArray = [];
+    // Loop through each recipe ID
+    for (let recipeId of recipeIds) 
+      {
+      try {
+        recipeDetails = await recipes_utils.getRecipeDetails(recipeId);
+        recipesDetailsArray.push(recipeDetails); // Add recipe details to the array
+       } 
+      catch (error) {
+        console.error(`Error fetching details for recipe ID ${recipeId}:`, error);
+      }
+      }
+    res.status(200).send(recipesDetailsArray);
+  }
+   catch (error) {
+    next(error);
+  }
+});
+
 
 module.exports = router;
